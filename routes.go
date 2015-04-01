@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"github.com/fluxxu/session"
 	"github.com/fluxxu/util"
 	"github.com/nu7hatch/gouuid"
