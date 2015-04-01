@@ -10,7 +10,7 @@ import (
 
 func RouteGetUser(c web.C, w http.ResponseWriter, r *http.Request) {
 	sess := c.Env["session"].(*session.Session)
-	token := &Token{Id: sess.Id(), User: sess.Get("user")}
+	token := &Token{Id: sess.Id(), User: sess.Get("user"), ExpiresAt: sess.ExpiresAt()}
 	util.Response(w).Send(200, token)
 }
 
@@ -50,7 +50,7 @@ func RouteLogin(c web.C, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token := &Token{Id: sess.Id(), User: user}
+	token := &Token{Id: sess.Id(), User: user, ExpiresAt: sess.ExpiresAt()}
 
 	util.Response(w).Send(200, token)
 }
