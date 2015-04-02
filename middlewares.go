@@ -19,7 +19,9 @@ func sessionMiddleware(c *web.C, h http.Handler) http.Handler {
 				util.Response(w).Error("load session error: " + err.Error())
 				return
 			}
-			c.Env["session"] = sess
+			if sess != nil {
+				c.Env["session"] = sess
+			}
 		}
 		h.ServeHTTP(w, r)
 		if sess != nil {
@@ -39,7 +41,7 @@ func Skip(path string) {
 func authMiddleware(c *web.C, h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		// allow POST /api/token
-		if r.Method == "POST" && r.URL.Path == "/api/token" {
+		if r.Method == "POST" && r.URL.Path == opts.MuxBase+"/token" {
 			h.ServeHTTP(w, r)
 			return
 		}
@@ -51,7 +53,7 @@ func authMiddleware(c *web.C, h http.Handler) http.Handler {
 		}
 
 		// allow login user only
-		if c.Env["session"] == nil {
+		if _, ok := c.Env["session"]; !ok {
 			util.Response(w).Error("Unauthorized", 401)
 			return
 		}
