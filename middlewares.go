@@ -17,7 +17,7 @@ func sessionMiddleware(c *web.C, h http.Handler) http.Handler {
 			sess, err = sessionStore.Load(sid)
 			if err != nil {
 				util.Response(w).Error("load session error: " + err.Error())
-				returnres := util.Response(w)
+				return
 			}
 			if sess != nil {
 				c.Env["session"] = sess
