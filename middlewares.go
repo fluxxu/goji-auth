@@ -44,8 +44,8 @@ func Skip(path string) {
 
 func authMiddleware(c *web.C, h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		// allow POST /api/token
-		if r.Method == "POST" && r.URL.Path == opts.MuxBase+"/token" {
+		// allow POST /token
+		if r.Method == "POST" && r.URL.Path == muxBase+"/token" {
 			h.ServeHTTP(w, r)
 			return
 		}

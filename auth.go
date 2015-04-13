@@ -3,7 +3,6 @@ package auth
 import (
 	"errors"
 	"github.com/fluxxu/session"
-	"github.com/jmoiron/sqlx"
 	"github.com/zenazn/goji/web"
 	"net/http"
 )
@@ -29,22 +28,37 @@ type Opts struct {
 	AccessChecker AccessCheckerInterface
 	Mux           *web.Mux
 	MuxBase       string
-	Dbx           *sqlx.DB
+	SessionStore  session.Store
 }
 
 var opts *Opts
 var sessionStore session.Store
+var userFinder UserFinderInterface
+var muxBase string
+
+var routeConfigured bool
 
 func Configure(options *Opts) {
 	opts = options
 
-	sessionStore = session.NewMySQLStore(opts.Dbx.DB, 3600*24)
+	if opts.SessionStore != nil {
+		sessionStore = opts.SessionStore
+	}
 
-	mux := options.Mux
-	mux.Use(sessionMiddleware)
-	mux.Use(authMiddleware)
+	if opts.UserFinder != nil {
+		userFinder = opts.UserFinder
+	}
 
-	mux.Get(opts.MuxBase+"/token", RouteGetUser)
-	mux.Post(opts.MuxBase+"/token", RouteLogin)
-	mux.Delete(opts.MuxBase+"/token", RouteLogout)
+	if !routeConfigured {
+		routeConfigured = true
+		mux := options.Mux
+		mux.Use(sessionMiddleware)
+		mux.Use(authMiddleware)
+
+		muxBase = opts.MuxBase
+
+		mux.Get(muxBase+"/token", RouteGetUser)
+		mux.Post(muxBase+"/token", RouteLogin)
+		mux.Delete(muxBase+"/token", RouteLogout)
+	}
 }

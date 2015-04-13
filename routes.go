@@ -25,7 +25,7 @@ func RouteLogin(c web.C, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := opts.UserFinder.FindUserByEmailAndPassword(body.Email, body.Password)
+	user, err := userFinder.FindUserByEmailAndPassword(body.Email, body.Password)
 	if err != nil {
 		if err == ErrUserNotFound {
 			util.Response(w).Error("login failed", 401)
