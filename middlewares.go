@@ -36,10 +36,10 @@ func sessionMiddleware(c *web.C, h http.Handler) http.Handler {
 	return http.HandlerFunc(fn)
 }
 
-var skipAuthPath = make(map[string]bool)
+var skipAuthPath = make(map[string][]string)
 
-func Skip(path string) {
-	skipAuthPath[path] = true
+func Skip(path string, args ...string) {
+	skipAuthPath[path] = args
 }
 
 func authMiddleware(c *web.C, h http.Handler) http.Handler {
@@ -51,9 +51,16 @@ func authMiddleware(c *web.C, h http.Handler) http.Handler {
 		}
 
 		// skip
-		if _, ok := skipAuthPath[r.URL.Path]; ok {
-			h.ServeHTTP(w, r)
-			return
+		if methods, ok := skipAuthPath[r.URL.Path]; ok {
+			if len(methods) == 0 {
+				h.ServeHTTP(w, r)
+				return
+			} else {
+				if util.IndexOfString(methods, r.Method) != -1 {
+					h.ServeHTTP(w, r)
+					return
+				}
+			}
 		}
 
 		// allow login user only
