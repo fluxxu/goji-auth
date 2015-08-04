@@ -58,5 +58,6 @@ func RouteLogin(c web.C, w http.ResponseWriter, r *http.Request) {
 func RouteLogout(c web.C, w http.ResponseWriter, r *http.Request) {
 	sess := c.Env["session"].(*session.Session)
 	sessionStore.Revoke(sess.Id())
-	w.WriteHeader(200)
+	delete(c.Env, "session")
+	util.Response(w).Send(200, sess.Id())
 }

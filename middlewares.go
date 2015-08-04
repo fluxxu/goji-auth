@@ -28,7 +28,7 @@ func sessionMiddleware(c *web.C, h http.Handler) http.Handler {
 			}
 		}
 		h.ServeHTTP(w, r)
-		if sess != nil {
+		if sess != nil && c.Env["session"] != nil {
 			sessionStore.Save(sess)
 		}
 		//fmt.Println("session out")
